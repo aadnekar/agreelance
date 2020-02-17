@@ -1,5 +1,10 @@
+# Django
 Django>=2.2.10,<2.3.0
 django-bootstrap4>=1.1.1,<1.2.0
 django-icons>=1.1.1,<1.2.0
+
+# Test and Linter
+flake8>=3.7.9,<3.8.0
+
 pytz==2019.3
 django-heroku
