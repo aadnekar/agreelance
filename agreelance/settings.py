@@ -31,20 +31,28 @@ ALLOWED_HOSTS = ['127.0.0.1','localhost','0.0.0.0']
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_DEFAULT = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+PROJECT_APPS = [
     'projects.apps.ProjectConfig',
     'home.apps.HomeConfig',
     'user.apps.UserConfig',
-    'bootstrap4',
-    'django_icons',
     'payment.apps.PaymentConfig',
 ]
+
+THIRD_PARTY_APPS = [
+    'bootstrap4',
+    'django_icons',
+]
+
+INSTALLED_APPS = DJANGO_DEFAULT + PROJECT_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
