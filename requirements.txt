@@ -6,7 +6,6 @@ django-icons>=1.1.1,<1.2.0
 # Test and Linter
 flake8>=3.7.9,<3.8.0
 pytest-django>=3.8.0,<3.9.0
-coverage>=5.0.3,<5.1.0
 
 # Utilities
 factory-boy>=2.12.0,<2.13.0

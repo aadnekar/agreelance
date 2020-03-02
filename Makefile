@@ -1,5 +1,8 @@
 #---- DOCKER INSTALL COMMANDS ----#
 
+build: ##@ Build docker
+	docker-compose build
+
 start:##@ Start the application
 	docker-compose up
 
@@ -36,7 +39,7 @@ force-makemigrations: ##@Docker Forcibly perform makemigrations on the separate 
 #----- TEST ENVIRONMENT COMMANDS ----#
 
 test: ##@Run test
-	docker-compose run application coverage run -m pytest
+	docker-compose run application pytest
 
 lint: ##@Run linter
 	docker-compose run application flake8
@@ -45,8 +48,8 @@ test_and_lint: ##@Run Linter and Tests
 	make test
 	make lint
 
-coverage_report:
-	docker-compose run application coverage html
+coverage: ##@Run pytest and generate test report in xml
+	docker-compose run application pytest --junitxml=test-results/junit.xml
 
 clean_start: ##@Delete docker images and re-apply and start the application
 	docker-compose down -v

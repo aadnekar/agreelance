@@ -14,5 +14,8 @@ ignore_errors = True
 #        *views.py
 
 [html]
-directory = coverage_report
-title = coverage_html_report
+directory = coverage_report/html
+title = results
+
+[xml]
+output = coverage_report/xml/results.xml
