@@ -36,7 +36,7 @@ force-makemigrations: ##@Docker Forcibly perform makemigrations on the separate 
 #----- TEST ENVIRONMENT COMMANDS ----#
 
 test: ##@Run test
-	docker-compose run backend python manage.py test
+	docker-compose run application coverage run -m pytest
 
 lint: ##@Run linter
 	docker-compose run application flake8
@@ -44,6 +44,9 @@ lint: ##@Run linter
 test_and_lint: ##@Run Linter and Tests
 	make test
 	make lint
+
+coverage_report:
+	docker-compose run application coverage html
 
 clean_start: ##@Delete docker images and re-apply and start the application
 	docker-compose down -v

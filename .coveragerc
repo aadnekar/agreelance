@@ -1,0 +1,18 @@
+# Configuration file for coverage.py
+
+# Configuration for when coverage is run
+[run]
+branch = True
+include =
+        */projects/*
+
+# Configuration for the report of coverage
+[report]
+ignore_errors = True
+#include =
+#        *models.py
+#        *views.py
+
+[html]
+directory = coverage_report
+title = coverage_html_report
