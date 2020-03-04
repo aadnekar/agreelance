@@ -27,6 +27,11 @@ jobs:
             coverage run -m pytest
             coverage report
             coverage html
+      - run:
+          name: Run Auto Formatting
+          command: |
+            . venv/bin/activate
+            black .
 
       - store_test_results:
           path: test-results

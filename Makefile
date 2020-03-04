@@ -16,6 +16,29 @@ loaddata: ##@Add Initial data to database
 	docker-compose run application python manage.py loaddata seed.json
 	@echo "Initial data added to database successfully"
 
+clean_start: ##@Delete docker images and re-apply and start the application
+	docker-compose down -v
+	docker-compose build
+	make makemigrations
+	make migrate
+	make start
+
+clean_start_bg: ##@Delete docker images and re-apply, start application in the background
+	docker-compose down -v
+	docker-compose build
+	make makemigrations
+	make migrate
+	make start_bg
+
+clean-install: ##@Delete the current database and install everything again
+	docker-compose run application python manage.py flush --skip-checks
+	docker-compose down -v
+	docker-compose build
+	make makemigrations
+	make migrate
+	make loaddata
+	make start
+
 #---- END DOCKER INSTALL COMMANDS ----#
 
 #---- START DJANGO COMMANDS ----#
@@ -38,7 +61,7 @@ force-makemigrations: ##@Docker Forcibly perform makemigrations on the separate 
 
 #----- TEST ENVIRONMENT COMMANDS ----#
 
-test: ##@Run test 
+test: ##@Run test
 	docker-compose run application pytest
 
 test-mark: ##@Run tests that are marked with mark={mark}
@@ -53,18 +76,13 @@ test_and_lint: ##@Run Linter and Tests
 coverage: ##@Run pytest and generate test report in xml
 	docker-compose run application pytest --junitxml=test-results/junit.xml
 
-clean_start: ##@Delete docker images and re-apply and start the application
-	docker-compose down -v
-	docker-compose build
-	make makemigrations
-	make migrate
-	make start
-
-clean_start_bg: ##@Delete docker images and re-apply, start application in the background
-	docker-compose down -v
-	docker-compose build
-	make makemigrations
-	make migrate
-	make start_bg
-
 #----- END TEST ENVIRONMENT COMMANDS ----#
+
+#----- AUTO FORMATTING ENVIRONMENT COMMANDS ----#
+
+auto-format:##@Run black auto formatting on all files in the repository
+	docker-compose run application black .
+
+#----- END AUTO FORMATTING ENVIRONMENT COMMANDS ----#
+
+

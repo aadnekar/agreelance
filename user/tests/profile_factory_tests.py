@@ -19,6 +19,7 @@ from projects.factories.project_category_factory import ProjectCategoryFactory
 
 #     assert profile.user is not None
 
+
 @pytest.fixture()
 def cleaning_category():
     return ProjectCategoryFactory(name="Cleaning")
@@ -45,11 +46,12 @@ def test_that_profile_contains_two_categories(cleaning_category, painting_catego
 
 @pytest.mark.django_db
 def test_that_profile_contains_three_categories(
-    cleaning_category, painting_category, gardening_category):
+    cleaning_category, painting_category, gardening_category
+):
 
-    profile = ProfileFactory.create(categories=(
-        cleaning_category, painting_category, gardening_category
-    ))
+    profile = ProfileFactory.create(
+        categories=(cleaning_category, painting_category, gardening_category)
+    )
 
     for category in profile.categories.all():
         assert str(category) in ("Cleaning", "Painting", "Gardening")

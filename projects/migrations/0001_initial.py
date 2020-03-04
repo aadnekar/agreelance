@@ -8,83 +8,198 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Delivery',
+            name="Delivery",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to=projects.models.directory_path)),
-                ('comment', models.TextField(max_length=500)),
-                ('delivery_time', models.DateTimeField(auto_now=True)),
-                ('responding_time', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('a', 'Accepted'), ('p', 'Pending'), ('d', 'Declined')], default='p', max_length=8)),
-                ('feedback', models.TextField(max_length=500)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file", models.FileField(upload_to=projects.models.directory_path)),
+                ("comment", models.TextField(max_length=500)),
+                ("delivery_time", models.DateTimeField(auto_now=True)),
+                ("responding_time", models.DateTimeField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("a", "Accepted"),
+                            ("p", "Pending"),
+                            ("d", "Declined"),
+                        ],
+                        default="p",
+                        max_length=8,
+                    ),
+                ),
+                ("feedback", models.TextField(max_length=500)),
             ],
         ),
         migrations.CreateModel(
-            name='Project',
+            name="Project",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField(max_length=500)),
-                ('status', models.CharField(choices=[('o', 'Open'), ('i', 'In progress'), ('f', 'Finished')], default='o', max_length=11)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField(max_length=500)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("o", "Open"),
+                            ("i", "In progress"),
+                            ("f", "Finished"),
+                        ],
+                        default="o",
+                        max_length=11,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ProjectCategory',
+            name="ProjectCategory",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
             ],
         ),
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField(max_length=500)),
-                ('budget', models.IntegerField(default=0)),
-                ('status', models.CharField(choices=[('ad', 'Waiting for delivery'), ('pa', 'Delivered and waiting for acceptance'), ('pp', 'Delivery has been accepted, awaiting payment'), ('ps', 'Payment for delivery is done'), ('dd', 'Declined delivery, please revise')], default='ad', max_length=50)),
-                ('feedback', models.TextField(default='', max_length=500)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField(max_length=500)),
+                ("budget", models.IntegerField(default=0)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ad", "Waiting for delivery"),
+                            ("pa", "Delivered and waiting for acceptance"),
+                            ("pp", "Delivery has been accepted, awaiting payment"),
+                            ("ps", "Payment for delivery is done"),
+                            ("dd", "Declined delivery, please revise"),
+                        ],
+                        default="ad",
+                        max_length=50,
+                    ),
+                ),
+                ("feedback", models.TextField(default="", max_length=500)),
             ],
         ),
         migrations.CreateModel(
-            name='TaskFile',
+            name="TaskFile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(storage=projects.models.OverwriteStorage(), upload_to=projects.models.directory_path)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "file",
+                    models.FileField(
+                        storage=projects.models.OverwriteStorage(),
+                        upload_to=projects.models.directory_path,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='TaskFileTeam',
+            name="TaskFileTeam",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('read', models.BooleanField(default=False)),
-                ('write', models.BooleanField(default=False)),
-                ('modify', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("read", models.BooleanField(default=False)),
+                ("write", models.BooleanField(default=False)),
+                ("modify", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='TaskOffer',
+            name="TaskOffer",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField(max_length=500)),
-                ('price', models.IntegerField(default=0)),
-                ('status', models.CharField(choices=[('a', 'Accepted'), ('p', 'Pending'), ('d', 'Declined')], default='p', max_length=8)),
-                ('feedback', models.TextField(max_length=500)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField(max_length=500)),
+                ("price", models.IntegerField(default=0)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("a", "Accepted"),
+                            ("p", "Pending"),
+                            ("d", "Declined"),
+                        ],
+                        default="p",
+                        max_length=8,
+                    ),
+                ),
+                ("feedback", models.TextField(max_length=500)),
             ],
         ),
         migrations.CreateModel(
-            name='Team',
+            name="Team",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('write', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("write", models.BooleanField(default=False)),
             ],
         ),
     ]
