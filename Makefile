@@ -38,9 +38,11 @@ force-makemigrations: ##@Docker Forcibly perform makemigrations on the separate 
 
 #----- TEST ENVIRONMENT COMMANDS ----#
 
-test: ##@Run test
+test: ##@Run test 
 	docker-compose run application pytest
 
+test-mark: ##@Run tests that are marked with mark={mark}
+	docker-compose run application pytest -v -m ${mark}
 lint: ##@Run linter
 	docker-compose run application flake8
 

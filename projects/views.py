@@ -60,6 +60,8 @@ def new_project(request):
 
 
 def project_view(request, project_id):
+    """ Displays all projects """
+
     project = Project.objects.get(pk=project_id)
     tasks = project.tasks.all()
     total_budget = 0 # Initializes the total budget to 0
@@ -175,6 +177,7 @@ def upload_file_to_task(request, project_id, task_id):
             }
         )
     return redirect('/user/login') # Redirects to /user/login
+
 
 def get_user_task_permissions(user, task):
 
