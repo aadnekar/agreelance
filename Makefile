@@ -31,7 +31,7 @@ clean_start_bg: ##@Delete docker images and re-apply, start application in the b
 	make start_bg
 
 clean-install: ##@Delete the current database and install everything again
-	docker-compose run application python manage.py flush --skip-checks
+	docker-compose run application python manage.py flush --no-input
 	docker-compose down -v
 	docker-compose build
 	make makemigrations
