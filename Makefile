@@ -6,7 +6,7 @@ build: ##@ Build docker
 start:##@ Start the application
 	docker-compose up
 
-start_bg:##@Start the application in the background (detached from terminal)
+start-bg:##@Start the application in the background (detached from terminal)
 	docker-compose up -d
 
 down:##@Stop the application
@@ -16,14 +16,14 @@ loaddata: ##@Add Initial data to database
 	docker-compose run application python manage.py loaddata seed.json
 	@echo "Initial data added to database successfully"
 
-clean_start: ##@Delete docker images and re-apply and start the application
+clean-start: ##@Delete docker images and re-apply and start the application
 	docker-compose down -v
 	docker-compose build
 	make makemigrations
 	make migrate
 	make start
 
-clean_start_bg: ##@Delete docker images and re-apply, start application in the background
+clean-start_bg: ##@Delete docker images and re-apply, start application in the background
 	docker-compose down -v
 	docker-compose build
 	make makemigrations
@@ -69,7 +69,7 @@ test-mark: ##@Run tests that are marked with mark={mark}
 lint: ##@Run linter
 	docker-compose run application flake8
 
-test_and_lint: ##@Run Linter and Tests
+test-and-lint: ##@Run Linter and Tests
 	make test
 	make lint
 
