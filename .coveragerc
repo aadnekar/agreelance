@@ -4,7 +4,9 @@
 [run]
 branch = True
 include =
-        */projects/*
+        ./projects/views.py
+        ./projects/factories*
+        ./users/factories*
 
 # Configuration for the report of coverage
 [report]
@@ -14,8 +16,4 @@ ignore_errors = True
 #        *views.py
 
 [html]
-directory = coverage_report/html
-title = results
-
-[xml]
-output = coverage_report/xml/results.xml
+directory = html-test-results

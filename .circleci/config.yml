@@ -23,10 +23,10 @@ jobs:
           command: |
             . venv/bin/activate
             mkdir test-results
-            pytest --junitxml=test-results/junit.xml
+            pytest --junitxml=test-results/xml/junit.xml
             coverage run -m pytest
             coverage report
-            coverage html
+            coverage html -d test-results/html
       - run:
           name: Run Auto Formatting
           command: |
@@ -34,7 +34,7 @@ jobs:
             black .
 
       - store_test_results:
-          path: test-results
+          path: test-results/xml
 
       - store_artifacts:
           path: test-results

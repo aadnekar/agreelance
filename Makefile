@@ -73,8 +73,12 @@ test-and-lint: ##@Run Linter and Tests
 	make test
 	make lint
 
-coverage: ##@Run pytest and generate test report in xml
+pytest-coverage: ##@Run pytest and generate test report in xml
 	docker-compose run application pytest --junitxml=test-results/junit.xml
+
+test-coverage:##@Run Coverage to optain coverage report
+	docker-compose run application coverage run -m pytest
+	docker-compose run application coverage html
 
 #----- END TEST ENVIRONMENT COMMANDS ----#
 
