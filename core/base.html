@@ -40,6 +40,11 @@
         <li class="nav-item">
           <a class="nav-link font-weight-light" href="{% url 'projects' %}">Projects</a>
         </li>
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link font-weight-light" href="{% url 'profile_page' %}">Profile</a>
+          </li>
+        {% endif %}
 
 
         <!--

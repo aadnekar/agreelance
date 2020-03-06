@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load bootstrap4 %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+  <body class="text-center">
+    <h1 class="py-4">{{user}} Profile Page</h1>
+
+    <main role="main" class="container">
+
+      <ul class="list-group">
+        <li class="list-group-item"><p>Name: {{ user.first_name }} {{ user.last_name }}</p></li>
+        <li class="list-group-item"><p>Email: {{ user.email }}</p></li>
+        {% if profile.company %}
+        <li class="list-group-item"><p>Company: {{ profile.company }}</p></li>
+        {% endif %}
+        {% if profile.country %}
+          <li class="list-group-item"><p>Country: {{ profile.country }}</p></li>
+        {% endif %}
+        {% if profile.state %}
+          <li class="list-group-item"><p>State: {{ profile.state }}</p></li>
+        {% endif %}
+        {% if profile.city %}
+          <li class="list-group-item"><p>City: {{ profile.city }}</p></li>
+        {% endif %}
+        {% if profile.postal_code %}
+          <li class="list-group-item"><p>Postal Code: {{ profile.postal_code }}</p></li>
+        {% endif %}
+        {% if profile.street_address %}
+          <li class="list-group-item"><p>Street Address: {{ profile.street_address }}</p></li>
+        {% endif %}
+        {% if categories %}
+          <li class="list-group-item"><p> Categories:
+            {% for category in categories %}
+              {{ category }}
+            {% endfor %}
+          </p></li>
+        {% endif %}
+      </ul>
+
+    </main>
+  </body>
+
+{% endblock %}

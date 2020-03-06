@@ -34,3 +34,21 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, "user/signup.html", {"form": form})
+
+
+def profile_page(request):
+
+    if not request.user.is_authenticated:
+        return redirect("signup")
+
+    context = {
+        "user": request.user,
+        "profile": request.user.profile,
+        "categories": request.user.profile.categories.all()
+    }
+
+    return render(
+        request=request,
+        template_name="user/profile.html",
+        context=context
+    )

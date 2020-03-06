@@ -6,6 +6,7 @@ branch = True
 include =
         ./projects/views.py
         ./projects/factories*
+        ./user/views.py
         ./users/factories*
 
 # Configuration for the report of coverage
