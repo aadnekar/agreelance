@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 /* Utility classes */
 
 .py-1 { padding-top: 10px; }
@@ -6,6 +10,18 @@
 .py-4 { padding-top: 40px; }
 
 
+/* Project View */
+div {
+  display: flex !important;
+}
+
+.left.container {
+  width: 50%;
+}
+
+.right-container {
+  width: 50%;
+}
 
 
 .wrapping-link{
