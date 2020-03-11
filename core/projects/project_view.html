@@ -6,27 +6,10 @@
 {% load icons %}
 
 {% block title %}Project{% endblock %}
-<html>
-  <head>
-    <style>
-      .my-container {
-        background: #444;
-        display: flex;
-      }
-
-      .left.container {
-        width: 50%;
-      }
-
-      .right-container {
-        width: 50%;
-      }
-    </style>
-  </head>
-</html>
 
 {% block content %}
-  <div class="my-container" style="display: flex; justify-content: space-between;">
+  <div class="my-container">
+
     <div class="left-content">
       <h3 class="my-3">{{ project.title }}</h3>
       <p>Project status: {{project.get_status_display}}</p>

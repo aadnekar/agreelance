@@ -11,8 +11,9 @@
 
 
 /* Project View */
-div {
-  display: flex !important;
+.my-container {
+  display: flex;
+  justify-content: space-between;
 }
 
 .left.container {
