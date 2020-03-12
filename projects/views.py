@@ -32,11 +32,12 @@ from django.contrib.auth.models import User
 def projects(request):
     projects = Project.objects.all()
     project_categories = ProjectCategory.objects.all()
-    filter = ProjectFilter(request.GET, queryset = projects)
+    filter = ProjectFilter(request.GET, queryset=projects)
     return render(
         request,
         "projects/projects.html",
-        {"projects": projects, "project_categories": project_categories, "filter": filter},
+        {"projects": projects,
+        "project_categories": project_categories, "filter": filter},
     )
 
 

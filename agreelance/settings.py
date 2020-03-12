@@ -51,7 +51,8 @@ PROJECT_APPS = [
 THIRD_PARTY_APPS = [
     "bootstrap4",
     "django_icons",
-    "django_filters"
+    "django_filters",
+    "widget_tweaks"
 ]
 
 INSTALLED_APPS = DJANGO_DEFAULT + PROJECT_APPS + THIRD_PARTY_APPS
