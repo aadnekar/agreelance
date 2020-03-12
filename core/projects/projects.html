@@ -27,6 +27,7 @@
     <div class="col-lg text-center">
 
       <div class="text-center d-inline-flex list-group mt-3" id="project-toggle" role="tablist">
+        {% if filter.qs %}
         <ul class="pagination">
           {% for project_category in project_categories %}
           <li class="page-item">
@@ -71,6 +72,9 @@
 
           </div>
         {% endfor %}
+        {% else %}
+          <p>No projects matching this search.</p>
+        {% endif %}
       </div>
 
     </div>
