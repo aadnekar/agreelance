@@ -23,6 +23,7 @@ from .forms import (
     TeamForm,
     TeamAddForm,
 )
+from .filters import ProjectFilter
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -31,10 +32,12 @@ from django.contrib.auth.models import User
 def projects(request):
     projects = Project.objects.all()
     project_categories = ProjectCategory.objects.all()
+    filter = ProjectFilter(request.GET, queryset=projects)
     return render(
         request,
         "projects/projects.html",
-        {"projects": projects, "project_categories": project_categories,},
+        {"projects": projects,
+        "project_categories": project_categories, "filter": filter},
     )
 
 

@@ -3,17 +3,31 @@
 {% load icons %}
 {% load static %}
 {% load project_extras %}
+{% load widget_tweaks %}
 
 {% block title %}Projects{% endblock %}
 
 {% block content %}
   <h2 class="mt-3 text-center" >Open Projects</h2>
 
+  <form method="get">
+    <div class="well">
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-10">
+          {% render_field filter.form.search type="search" class="form-control" placeholder="Search for open projects" %}
+        </div>
+        <button type="submit" class="btn btn-primary">
+          Search
+        </button>
+      </div>
+    </div>
+  </form>
 
   <div class="row">
     <div class="col-lg text-center">
 
       <div class="text-center d-inline-flex list-group mt-3" id="project-toggle" role="tablist">
+        {% if filter.qs %}
         <ul class="pagination">
           {% for project_category in project_categories %}
           <li class="page-item">
@@ -37,7 +51,7 @@
           <div class="tab-pane fade show" id="{{project_category}}" role="tabpanel" aria-labelledby="category-{{project_category}}">
             <h3 class="mb-3 mt-5">{{project_category}}</h3>
             <div class="row projects-view">
-                {% for project in projects %}
+                {% for project in filter.qs %}
                   {% if project.status == project.OPEN and project.category.id == project_category.id %}
                   <a class="open-project-view-item" href="{% url 'project_view' project_id=project.id%}">
                   <div class="col-md mb-3 ml-3 mr-3 mt-3 project-box-style">
@@ -58,6 +72,9 @@
 
           </div>
         {% endfor %}
+        {% else %}
+          <p>No projects matching this search.</p>
+        {% endif %}
       </div>
 
     </div>
