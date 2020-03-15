@@ -132,11 +132,3 @@ Continuous integration will build the code pushed to master and push it to your 
 ### Reset Database
 `heroku pg:reset DATABASE_URL -a <heroku-app-name>`
 
-## Data seeding
-The data seed provided contains 3 users:
-
-Username | Password | Description
----|---|---
-admin|qwerty123|Admin user that owns one project
-harrypotter|qwerty123|
-joe|qwerty123|
