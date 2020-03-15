@@ -42,6 +42,7 @@ def profile_page(request):
         return redirect("signup")
 
     context = {
+        "username": request.user.username.title(),
         "user": request.user,
         "profile": request.user.profile,
         "categories": request.user.profile.categories.all()

@@ -10,6 +10,48 @@
 .py-4 { padding-top: 40px; }
 
 
+/* Profile View */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-container ul {
+  width: 50%;
+  text-align: left;
+}
+
+.profile-container ul li {
+  margin: 4px;
+  padding: 10px;
+}
+
+.profile-container ul li p {
+  margin: 0;
+}
+
+.profile-container ul div {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0 0 10px;
+}
+
+.profile-container ul div p {
+  margin: 0;
+}
+
+.profile-container ul div li {
+  list-style: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+
+  margin: 0;
+  margin-left: 3rem;
+  padding: 0.5rem;
+}
+
 /* Project View */
 .my-container {
   display: flex;
