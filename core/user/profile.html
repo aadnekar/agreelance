@@ -6,38 +6,82 @@
 
 {% block content %}
   <body class="text-center">
-    <h1 class="py-4">{{user}} Profile Page</h1>
+    <h1 class="py-4">{{username}}'s Profile Page</h1>
 
-    <main role="main" class="container">
+    <main role="main" class="profile-container">
 
       <ul class="list-group">
         <li class="list-group-item"><p>Name: {{ user.first_name }} {{ user.last_name }}</p></li>
-        <li class="list-group-item"><p>Email: {{ user.email }}</p></li>
-        {% if profile.company %}
-        <li class="list-group-item"><p>Company: {{ profile.company }}</p></li>
+        <li class="list-group-item"><p>Email:
+          {% if use.email %}
+          {{ user.email }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <li class="list-group-item"><p>Company:
+          {% if profile.company %}
+          {{ profile.company }}
+          {% else %}
+          Has not been registered
+        </p></li>
         {% endif %}
-        {% if profile.country %}
-          <li class="list-group-item"><p>Country: {{ profile.country }}</p></li>
-        {% endif %}
-        {% if profile.state %}
-          <li class="list-group-item"><p>State: {{ profile.state }}</p></li>
-        {% endif %}
-        {% if profile.city %}
-          <li class="list-group-item"><p>City: {{ profile.city }}</p></li>
-        {% endif %}
-        {% if profile.postal_code %}
-          <li class="list-group-item"><p>Postal Code: {{ profile.postal_code }}</p></li>
-        {% endif %}
-        {% if profile.street_address %}
-          <li class="list-group-item"><p>Street Address: {{ profile.street_address }}</p></li>
-        {% endif %}
-        {% if categories %}
-          <li class="list-group-item"><p> Categories:
-            {% for category in categories %}
-              {{ category }}
-            {% endfor %}
-          </p></li>
-        {% endif %}
+
+        <li class="list-group-item"><p>Country:
+          {% if profile.country %}
+          {{ profile.country }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <li class="list-group-item"><p>State:
+          {% if profile.state %}
+          {{ profile.state }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <li class="list-group-item"><p>
+          City:
+          {% if profile.city %}
+          {{ profile.city }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <li class="list-group-item"><p>Postal Code:
+          {% if profile.postal_code %}
+          {{ profile.postal_code }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <li class="list-group-item"><p>Street Address:
+          {% if profile.street_address %}
+          {{ profile.street_address }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <div class="categories-profile list-group-item">
+         <p> Categories:
+            {% if categories %}
+              {% for category in categories %}
+              <li class="list-inner-group-item">
+                <p>{{ category }}</p>
+              </li>
+              {% endfor %}
+            {% else %}
+              No categories registered for {{user}}
+            {% endif %}
+          </p>
+        </div>
       </ul>
 
     </main>
