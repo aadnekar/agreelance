@@ -20,7 +20,7 @@ def signup(request):
 
             user.profile.company = form.cleaned_data.get("company")
 
-            user.is_active = False
+            user.is_active = True
             user.profile.categories.add(*form.cleaned_data["categories"])
             user.save()
             raw_password = form.cleaned_data.get("password1")
