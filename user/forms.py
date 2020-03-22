@@ -17,7 +17,6 @@ class SignUpForm(UserCreationForm):
     )
 
     phone_number = forms.CharField(max_length=50)
-
     country = forms.CharField(max_length=50)
     state = forms.CharField(max_length=50)
     city = forms.CharField(max_length=50)
@@ -28,6 +27,19 @@ class SignUpForm(UserCreationForm):
         queryset=ProjectCategory.objects.all(),
         help_text='Hold down "Control", or "Command" on a Mac, to select more than one.',
     )
+
+    def clean(self):
+        """ Verifies that the fields are correct"""
+        cleaned_data = super(SignUpForm, self).clean()
+        email = cleaned_data.get('email')
+        email_confirmation = cleaned_data.get('email_confirmation')
+
+        if email and email_confirmation and email != email_confirmation:
+            self._errors['email_confirmation'] = self.error_class([
+                'Emails do not match.'
+            ])
+            del self.cleaned_data['email_confirmation']
+        return cleaned_data
 
     class Meta:
         model = User

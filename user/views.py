@@ -19,16 +19,23 @@ def signup(request):
             user.refresh_from_db()
 
             user.profile.company = form.cleaned_data.get("company")
+            user.profile.phone_number = form.cleaned_data.get("phone_number")
+            user.profile.country = form.cleaned_data.get("country")
+            user.profile.state = form.cleaned_data.get("state")
+            user.profile.city = form.cleaned_data.get("city")
+            user.profile.postal_code = form.cleaned_data.get("postal_code")
+            user.profile.street_address = form.cleaned_data.get("street_address")
+            user.profile.city = form.cleaned_data.get("city")
 
-            user.is_active = True
             user.profile.categories.add(*form.cleaned_data["categories"])
+            user.is_active = True
             user.save()
             raw_password = form.cleaned_data.get("password1")
             user = authenticate(username=user.username, password=raw_password)
             from django.contrib import messages
 
             messages.success(
-                request, "Your account has been created and is awaiting verification."
+                request, "Your account has been created, please login to begin."
             )
             return redirect("home")
     else:

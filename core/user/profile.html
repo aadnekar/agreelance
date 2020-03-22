@@ -13,8 +13,16 @@
       <ul class="list-group">
         <li class="list-group-item"><p>Name: {{ user.first_name }} {{ user.last_name }}</p></li>
         <li class="list-group-item"><p>Email:
-          {% if use.email %}
+          {% if user.email %}
           {{ user.email }}
+          {% else %}
+          Has not been registered
+          {% endif %}
+        </p></li>
+
+        <li class="list-group-item"><p>Phone:
+          {% if profile.phone_number %}
+          {{ profile.phone_number }}
           {% else %}
           Has not been registered
           {% endif %}
