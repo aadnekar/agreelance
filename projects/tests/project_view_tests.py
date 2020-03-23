@@ -4,18 +4,17 @@ from django.test import Client
 from django.http import (
     Http404
 )
-
 from projects.models import (
     Project,
     TaskOffer,
 )
-
+from projects.forms import(
+    TaskOfferForm,
+)
 from projects.templatetags.project_extras import get_all_taskoffers
-
 from projects.factories.project_factory import ProjectFactory
 from projects.factories.task_factory import TaskFactory
 from projects.factories.task_offer_factory import TaskOfferFactory
-
 from user.factories.profile_factory import ProfileFactory
 
 
@@ -32,7 +31,7 @@ def project():
 
 @pytest.fixture
 def profile():
-    """ Returns a profile """
+    """ Returns a user profile """
     return ProfileFactory()
 
 
@@ -96,32 +95,6 @@ def test_that_all_task_related_to_a_project_are_returned(client, project):
 
 
 @pytest.mark.django_db
-def test_that_total_budget_cannot_be_negative(client, project):
-    """
-    If the budget of a task is set to a negative amount, the total_budget
-    shoule not be negative.
-    """
-    generate_tasks(project=project, number_of_tasks=3, budget=-50)
-    response = client.get(f"/projects/{project.id}/")
-
-    assert response.context['total_budget'] > 0
-
-
-#TODO: Fix fault, temporarily skipped due to fail.
-@pytest.mark.skip
-@pytest.mark.django_db
-def test_that_total_budget_cannot_be_negative(client, project):
-    """
-    If the budget of a task is set to a negative amount, the total_budget
-    shoule not be negative.
-    """
-    generate_tasks(project=project, number_of_tasks=3, budget=-50)
-    response = client.get(f"/projects/{project.id}/")
-
-    assert response.context['total_budget'] > 0
-
-
-@pytest.mark.django_db
 def test_that_total_budget_is_properly_added(client, project):
     """
     Tests that if tasks with budgets are added appropriately
@@ -174,3 +147,194 @@ def test_offer_is_displayed_for_project_owner(
 
     assert response.status_code == 200
     assert  offer.status == TaskOffer.PENDING
+
+
+@pytest.mark.django_db
+def test_submit_offer_successfull(client, profile, project):
+    """ A successfull post on the TaskOfferForm should create a new TaskOffer """
+    task = TaskFactory(project=project)
+    client.force_login(profile.user)
+
+    form_data = {
+        'offer_submit': True,
+        'title': "A successfull task offer",
+        'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec venenatis.",
+        'price': 200,
+        'taskvalue': task.id
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    task_offers = TaskOffer.objects.all()
+
+    assert response.status_code == 200
+    assert isinstance(response.context['task_offer_form'], TaskOfferForm)
+    assert len(task_offers) > 0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "title,description,price",
+    [
+        ('', 'Lorem ipsum dolaris jabbadabba', 200),
+        ("""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent a quam
+         nibh. In et lobortis magna, at convallis ipsum. Donec quis vehicula diam. 
+         Nullam blandit purus vitae mauris eleifend venenatis. Vivamus ut lacus nec 
+         diam pulvinar fermentum ornare non nulla. Phasellus aliquam libero a sem 
+         congue, vitae fringilla sem malesuada. Vestibulum tempus non ligula sit amet 
+         imperdiet. Praesent scelerisque, odio in vestibulum fermentum, lacus ipsum 
+         rhoncus ante, ut gravida enim velit mollis mauris. In hac habitasse platea 
+         dictumst. Etiam finibus consectetur purus, tempor sodales leo semper in. 
+         Nullam dapibus dapibus blandit. Sed lectus urna, vestibulum eget sem eu, 
+         consectetur rutrum quam. Donec ac erat nunc. Integer quis vulputate purus. 
+         Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed semper urna 
+         id sem porta fringilla. Aenean a auctor tellus. Praesent fermentum libero non 
+         quam interdum dapibus. Integer non nisi magna. Donec ut euismod turpis, vitae 
+         egestas dolor. Cras ut mollis enim, nec facilisis libero. Vivamus nec nulla 
+         lacus. Maecenas velit nisl, vestibulum at pharetra ac, sollicitudin congue 
+         nunc. Sed ac rhoncus lorem. Aliquam dictum ex vitae elementum fringilla. 
+         Aliquam urna dui, maximus ut tincidunt vitae, placerat eu mauris. Curabitur 
+         hendrerit semper ipsum in congue. Suspendisse potenti. 
+         Aenean ultrices est nec.""", 'Lorem ipsum dolaris jabbadabba', 200),
+         (999, 'Lorem ipsum dolaris jabbadabba', 200),
+         ('Proper Title', 501, 200),
+         ('Proper Title', 'Lorem ipsum dolaris jabbadabba', 'This is not numbers'),
+    ]
+)
+def test_that_no_offer_is_created_when_task_offer_form_fields_are_invalid(
+    client, profile, project, title, description, price):
+    """A Task Offer should not be created when a form field is invalid."""
+    task = TaskFactory(project=project)
+    client.force_login(profile.user)
+
+    form_data = {
+        'offer_submit': {
+            'offer_submit': True,
+            'title': title,
+            'description': description,
+            'price': price,
+            'taskvalue': task.id
+        }
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    task_offers = TaskOffer.objects.all()
+
+    assert response.status_code == 200
+    assert len(task_offers) == 0
+
+
+@pytest.mark.django_db
+def test_successfully_accept_task_offer(client, project_with_pending_offer):
+    """An accepted task offer should make the offerer a participant in the project"""
+    owner = project_with_pending_offer['project_owner']
+    offerer = project_with_pending_offer['offerer']
+    project = project_with_pending_offer['project']
+    offer = project_with_pending_offer['offer']
+    client.force_login(owner.user)
+
+    form_data = {
+        'offer_response': True,
+        'status': "This is an invalid status code",
+        'feedback': "This is a valid text area",
+        'taskofferid': offer.id
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    project = Project.objects.get(id=project.id)
+
+    assert response.status_code == 200
+    assert len(project.participants.all()) == 0
+
+
+@pytest.mark.django_db
+def test_TaskOfferResponseForm_with_invalid_fields(client, project_with_pending_offer):
+    """
+    The offerer shall not be added to participants of the project if the
+    TaskOfferResponseForm is not valid
+    """
+    owner = project_with_pending_offer['project_owner']
+    offerer = project_with_pending_offer['offerer']
+    project = project_with_pending_offer['project']
+    offer = project_with_pending_offer['offer']
+    client.force_login(owner.user)
+
+    form_data = {
+        'offer_response': True,
+        'status': TaskOffer.ACCEPTED,
+        'feedback': 'jabbadabba helt ok',
+        'taskofferid': offer.id
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    project = Project.objects.get(id=project.id)
+
+    assert response.status_code == 200
+    assert len(project.participants.all()) == 1
+    assert project.participants.all()[0] == offerer
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'status', [(TaskOffer.PENDING,), (TaskOffer.DECLINED,)]
+)
+def test_that_no_participant_is_added_if_status_is_not_set_to_accepted(
+    client, project_with_pending_offer, status):
+    """
+    If status code is set to declined or kept as pending, the offerer should not
+    be put as a participant in the project
+    """
+    owner = project_with_pending_offer['project_owner']
+    offerer = project_with_pending_offer['offerer']
+    project = project_with_pending_offer['project']
+    offer = project_with_pending_offer['offer']
+    client.force_login(owner.user)
+
+    form_data = {
+        'offer_response': True,
+        'status': status,
+        'feedback': 'jabbadabba helt ok',
+        'taskofferid': offer.id
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    project = Project.objects.get(id=project.id)
+
+    assert response.status_code == 200
+    assert len(project.participants.all()) == 0
+
+
+@pytest.mark.temp
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'status', [(Project.OPEN), (Project.INPROG), (Project.FINISHED)]
+)
+def test_successfully_changing_status_of_a_project(
+    client, project_with_pending_offer, status):
+    owner = project_with_pending_offer['project_owner']
+    project = project_with_pending_offer['project']
+    client.force_login(owner.user)
+
+    form_data = {
+        'status_change': True,
+        'status': status
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    project.refresh_from_db()
+
+    assert response.status_code == 200
+    assert project.status == status
+
+
+@pytest.mark.temp
+@pytest.mark.django_db
+def test_that_status_of_project_is_not_changed_when_the_ProjectStatusForm_is_invalid(
+    client, project_with_pending_offer):
+    owner = project_with_pending_offer['project_owner']
+    project = project_with_pending_offer['project']
+    old_project_status = project.status
+    client.force_login(owner.user)
+
+    form_data = {
+        'status_change': True,
+        'status': 'This is not a valid status'
+    }
+    response = client.post(f'/projects/{project.id}/', data=form_data)
+    project.refresh_from_db()
+
+    assert response.status_code == 200
+    assert project.status == old_project_status
