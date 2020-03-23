@@ -15,6 +15,9 @@ from projects.templatetags.project_extras import get_all_taskoffers
 from projects.factories.project_factory import ProjectFactory
 from projects.factories.task_factory import TaskFactory
 from projects.factories.task_offer_factory import TaskOfferFactory
+from projects.views import (
+    get_user_task_permissions,
+)
 from user.factories.profile_factory import ProfileFactory
 
 
@@ -34,6 +37,24 @@ def profile():
     """ Returns a user profile """
     return ProfileFactory()
 
+
+@pytest.fixture
+def task():
+    """ Returns a task """
+    return TaskFactory()
+
+
+@pytest.fixture
+def profile_project_task():
+    """ Returns a profile, project and task """
+    profile = ProfileFactory()
+    project = ProjectFactory(user=profile)
+    task = TaskFactory(project=project)
+    return {
+        'profile': profile,
+        'project': project,
+        'task': task
+    }
 
 @pytest.fixture
 def project_with_pending_offer():
@@ -320,7 +341,6 @@ def test_successfully_changing_status_of_a_project(
     assert project.status == status
 
 
-@pytest.mark.temp
 @pytest.mark.django_db
 def test_that_status_of_project_is_not_changed_when_the_ProjectStatusForm_is_invalid(
     client, project_with_pending_offer):
@@ -338,3 +358,79 @@ def test_that_status_of_project_is_not_changed_when_the_ProjectStatusForm_is_inv
 
     assert response.status_code == 200
     assert project.status == old_project_status
+
+
+@pytest.mark.temp
+@pytest.mark.django_db
+def test_task_owner_has_all_permissions(profile_project_task):
+    user = profile_project_task['profile'].user
+    task = profile_project_task['task']
+
+    expected_permissions = {
+        'write': True,
+        'read': True,
+        'modify': True,
+        'owner': True,
+        'upload': True,
+    }
+    actual_permissions = get_user_task_permissions(user=user, task=task)
+
+    assert all(
+        [actual == expected for actual, expected in zip(
+            expected_permissions.values(),actual_permissions.values()
+        )]
+    )
+
+
+@pytest.mark.temp
+@pytest.mark.django_db
+def test_accepted_task_offer_gives_correct_permissions_to_offerer():
+    """
+    A offerer with accepted offer has write, read, modify and upload permissions,
+    but not does not have owner permissions.
+    """
+    offerer = ProfileFactory()
+    project = ProjectFactory()
+    task = TaskFactory(project=project, budget=200)
+    offer = TaskOfferFactory(task=task, offerer=offerer)
+    offer.status = TaskOffer.ACCEPTED
+    offer.save()
+
+    expected_permissions = {
+        'write': True,
+        'read': True,
+        'modify': True,
+        'owner': False,
+        'upload': True,
+    }
+    actual_permissions = get_user_task_permissions(user=offerer.user, task=task)
+
+    assert all(
+        [actual == expected for actual, expected in zip(
+            expected_permissions.values(),actual_permissions.values()
+        )]
+    )
+
+
+@pytest.mark.temp
+@pytest.mark.django_db
+def test_default_permissions(profile, task):
+    """
+    A user without any relation to a task does not any have permissions
+    """
+    user = profile.user
+
+    expected_permissions = {
+        'write': False,
+        'read': False,
+        'modify': False,
+        'owner': False,
+        'upload': False,
+    }
+    actual_permissions = get_user_task_permissions(user=user, task=task)
+
+    assert all(
+        [actual == expected for actual, expected in zip(
+            expected_permissions.values(),actual_permissions.values()
+        )]
+    )
