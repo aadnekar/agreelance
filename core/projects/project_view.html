@@ -20,7 +20,11 @@
       <h4>Category: {{project.category}}</h4>
     </div>
     <div class="right-content">
-      <img src="{% static 'img/idea.jpg' %}" alt="project image">
+      {% if project.image %}
+        <img src="{{ project.image }}" alt="project image">
+      {% else %}
+        <img src="{% static 'img/idea.jpg' %}" alt="project image">
+      {% endif %}
     </div>
   </div>
 
