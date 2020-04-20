@@ -5,6 +5,7 @@ from django.http import (
     Http404
 )
 from projects.models import (
+    Task,
     Project,
     TaskOffer,
 )
@@ -17,6 +18,9 @@ from projects.factories.task_factory import TaskFactory
 from projects.factories.task_offer_factory import TaskOfferFactory
 from projects.views import (
     get_user_task_permissions,
+)
+from projects.viewsets.project_view import (
+    calculate_project_budget,
 )
 from user.factories.profile_factory import ProfileFactory
 
@@ -116,22 +120,22 @@ def test_that_all_task_related_to_a_project_are_returned(client, project):
 
 
 @pytest.mark.django_db
-def test_that_total_budget_is_properly_added(client, project):
+def test_that_project_budget_is_properly_added(client, project):
     """
     Tests that if tasks with budgets are added appropriately
     """
     generate_tasks(project=project, number_of_tasks=3, budget=300)
     response = client.get(f"/projects/{project.id}/")
 
-    assert response.context['total_budget'] == 900
+    assert response.context['project_budget'] == 900
 
 
 @pytest.mark.django_db
-def test_total_budget_when_there_are_no_tasks(client, project):
-    """ If there are no tasks the total_budget should equal zero """
+def test_project_budget_when_there_are_no_tasks(client, project):
+    """ If there are no tasks the project_budget should equal zero """
     response = client.get(f"/projects/{project.id}/")
 
-    assert response.context['total_budget'] == 0
+    assert response.context['project_budget'] == 0
 
 
 @pytest.mark.django_db
@@ -319,7 +323,6 @@ def test_that_no_participant_is_added_if_status_is_not_set_to_accepted(
     assert len(project.participants.all()) == 0
 
 
-@pytest.mark.temp
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'status', [(Project.OPEN), (Project.INPROG), (Project.FINISHED)]
@@ -360,7 +363,6 @@ def test_that_status_of_project_is_not_changed_when_the_ProjectStatusForm_is_inv
     assert project.status == old_project_status
 
 
-@pytest.mark.temp
 @pytest.mark.django_db
 def test_task_owner_has_all_permissions(profile_project_task):
     user = profile_project_task['profile'].user
@@ -382,7 +384,6 @@ def test_task_owner_has_all_permissions(profile_project_task):
     )
 
 
-@pytest.mark.temp
 @pytest.mark.django_db
 def test_accepted_task_offer_gives_correct_permissions_to_offerer():
     """
@@ -412,7 +413,6 @@ def test_accepted_task_offer_gives_correct_permissions_to_offerer():
     )
 
 
-@pytest.mark.temp
 @pytest.mark.django_db
 def test_default_permissions(profile, task):
     """
@@ -434,3 +434,16 @@ def test_default_permissions(profile, task):
             expected_permissions.values(),actual_permissions.values()
         )]
     )
+
+
+@pytest.mark.temp
+@pytest.mark.django_db
+def test_calculate_project_budget():
+    for n in range(5):
+        TaskFactory(budget=10)
+    tasks = Task.objects.all()
+
+    expected_result = 50
+    result = calculate_project_budget(tasks)
+
+    assert result == expected_result
