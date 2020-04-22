@@ -50,7 +50,7 @@ def test_boundary_values(client, project, profile):
         task_offers = TaskOffer.objects.all()
         assert response.status_code == 200
         assert len(task_offers) == 0
-    
+
     # Test description: 0 characters
     new_data = data
     new_data['description'] = ''

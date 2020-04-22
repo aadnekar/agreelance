@@ -101,6 +101,35 @@ class Task(models.Model):
         return task_offer
 
 
+class TaskPermissions(models.Model):
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE,
+        related_name="permissions_for_task"
+    )
+    profile = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name="permissions_for_user"
+    )
+    read = models.BooleanField(default=False)
+    write = models.BooleanField(default=False)
+    modify = models.BooleanField(default=False)
+    owner = models.BooleanField(default=False)
+    upload = models.BooleanField(default=False)
+    view_task = models.BooleanField(default=False)
+
+    def get_permissions(self):
+        return {
+            "write": self.write,
+            "read": self.read,
+            "modify": self.modify,
+            "owner": self.owner,
+            "upload": self.upload,
+            "view_task": self.view_task
+        }
+
+
+
 class Team(models.Model):
     name = models.CharField(max_length=200)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="teams")

@@ -89,6 +89,19 @@ def get_response(request):
     pass
 
 
+@pytest.mark.temp
+@pytest.mark.django_db
+def test_calculate_project_budget():
+    for n in range(5):
+        TaskFactory(budget=10)
+    tasks = Task.objects.all()
+
+    expected_result = 50
+    result = calculate_project_budget(tasks)
+
+    assert result == expected_result
+
+
 @pytest.mark.django_db
 def test_request_to_existing_project(client, project):
     """Request to an exisiting project should return 200 OK """
@@ -436,14 +449,13 @@ def test_default_permissions(profile, task):
     )
 
 
-@pytest.mark.temp
-@pytest.mark.django_db
-def test_calculate_project_budget():
-    for n in range(5):
-        TaskFactory(budget=10)
-    tasks = Task.objects.all()
+# @pytest.mark.temp
+# @pytest.mark.django_db
+# def test_task_model_read_field():
+#     task = TaskFactory()
+#     task.read.add(ProfileFactory())
+#     task.save()
+#     task.refresh_from_db()
+    
 
-    expected_result = 50
-    result = calculate_project_budget(tasks)
-
-    assert result == expected_result
+#     assert False

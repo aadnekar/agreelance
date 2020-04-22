@@ -3,6 +3,7 @@ from user.models import Profile
 from .models import (
     Project,
     Task,
+    TaskPermissions,
     TaskFile,
     TaskOffer,
     Delivery,
@@ -23,6 +24,9 @@ from .forms import (
     TeamForm,
     TeamAddForm,
 )
+
+from user.models import Profile
+
 from .filters import ProjectFilter
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -168,60 +172,84 @@ def upload_file_to_task(request, project_id, task_id):
     return redirect("/user/login")  # Redirects to /user/login
 
 
+
+def set_and_retrieve_user_permissions(task, profile, write=False, read=False, modify=False, owner=False, upload=False, view_task=False):
+    try:
+        result = TaskPermissions.objects.get(task=task, profile=profile)
+        result.write=write
+        result.read=read
+        result.modify=modify
+        result.owner=owner
+        result.upload=upload
+        result.view_task=view_task
+        result.save()
+    except TaskPermissions.DoesNotExist:
+        result = TaskPermissions.objects.create(
+            task=task, profile=profile, write=write, read=read,
+            modify=modify, owner=owner, upload=upload, view_task=view_task
+        )
+    return result.get_permissions()
+
+
+def get_task_permissions_for_project_owner(task, profile):
+    return set_and_retrieve_user_permissions(
+        task=task, profile=profile, write=True, read=True,
+        modify=True, owner=True, upload=True
+    )
+
+
+def get_task_permissions_for_accepted_work(task, profile):
+    return set_and_retrieve_user_permissions(
+        task=task, profile=profile, write=True,
+        read=True, modify=True, owner=False, upload=True
+    )
+
+
+def get_default_task_permissions(task, profile):
+    read = False or profile.task_participants_read.filter(id=task.id).exists()
+    upload = False or profile.teams.filter(task__id=task.id, write=True).exists()
+    write = False or profile.task_participants_write.filter(id=task.id).exists()
+    modify = False or profile.task_participants_modify.filter(id=task.id).exists()
+    view_task = False or profile.teams.filter(task__id=task.id).exists()
+
+    return set_and_retrieve_user_permissions(
+        task=task, profile=profile, write=write,
+        read=read, modify=modify, view_task=view_task
+    )
+
+def get_user_permissions(task, profile):
+    try:
+        return TaskPermissions.objects.get(task=task)
+    except TaskPermissions.DoesNotExist:
+        print(f"Permissions does not exist for {profile} on {task}")
+
+def user_is_project_owner(user, project):
+    return user == project.user.user
+
+def user_has_been_accepted_for_task(task, user):
+    return (
+        task.accepted_task_offer() and
+        task.accepted_task_offer().offerer == user.profile
+    )
+
+def get_user_profile(user):
+    try:
+        return Profile.objects.get(user=user)
+    except ProfileDoesNotExist:
+        return f"Profile for {user} does not exist"
+
+
 def get_user_task_permissions(user, task):
+    """ Retrieve what permission a user has in a task """
+    profile = get_user_profile(user)
 
-    if user == task.project.user.user:
-        return {
-            "write": True,
-            "read": True,
-            "modify": True,
-            "owner": True,
-            "upload": True,
-        }
-    if (
-        task.accepted_task_offer()
-        and task.accepted_task_offer().offerer == user.profile
-    ):
-        return {
-            "write": True,
-            "read": True,
-            "modify": True,
-            "owner": False,
-            "upload": True,
-        }
-    user_permissions = {
-        "write": False,
-        "read": False,
-        "modify": False,
-        "owner": False,
-        "view_task": False,
-        "upload": False,
-    }
-    user_permissions["read"] = (
-        user_permissions["read"]
-        or user.profile.task_participants_read.filter(id=task.id).exists()
-    )
+    if user_is_project_owner(user, task.project):
+        return get_task_permissions_for_project_owner(task, profile)
 
-    # Team members can view its teams tasks
-    user_permissions["upload"] = (
-        user_permissions["upload"]
-        or user.profile.teams.filter(task__id=task.id, write=True).exists()
-    )
-    user_permissions["view_task"] = (
-        user_permissions["view_task"]
-        or user.profile.teams.filter(task__id=task.id).exists()
-    )
+    if user_has_been_accepted_for_task(task, user):
+        return get_task_permissions_for_accepted_work(task, profile)
 
-    user_permissions["write"] = (
-        user_permissions["write"]
-        or user.profile.task_participants_write.filter(id=task.id).exists()
-    )
-    user_permissions["modify"] = (
-        user_permissions["modify"]
-        or user.profile.task_participants_modify.filter(id=task.id).exists()
-    )
-
-    return user_permissions
+    return get_default_task_permissions(task, profile)
 
 
 @login_required
@@ -232,6 +260,8 @@ def task_view(request, project_id, task_id):
     accepted_task_offer = task.accepted_task_offer()
 
     user_permissions = get_user_task_permissions(request.user, task)
+    for perm in user_permissions:
+        print(f"PERMISSION: {perm}")
     if (
         not user_permissions["read"]
         and not user_permissions["write"]
